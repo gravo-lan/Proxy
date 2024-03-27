@@ -1,2 +1,97 @@
-package me.gravolan.proxy;public class Proxy {
+package me.gravolan.proxy;
+
+import com.sun.net.httpserver.*;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.FileInputStream;
+import java.net.*;
+import java.security.cert.CertificateException;
+import java.util.logging.*;
+import javax.net.ssl.*;
+import java.security.*;
+
+public class Proxy {
+    private static final Logger logger = Logger.getLogger(Proxy.class.getName());
+    private static final int PORT = 8000;
+    private static final String KEYSTORE_PATH = "src/me/gravolan/proxy/keystore.jks";
+    private static final String KEYSTORE_PASSWORD = "pwnword";
+
+    public static void main(String[] args) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
+        logger.setLevel(Level.INFO);
+        ConsoleHandler consoleHandler = new ConsoleHandler();
+        consoleHandler.setLevel(Level.ALL);
+        logger.addHandler(consoleHandler);
+
+        // Load the keystore
+        char[] keystorePasswordArray = KEYSTORE_PASSWORD.toCharArray();
+        KeyStore keystore = KeyStore.getInstance("JKS");
+        keystore.load(new FileInputStream(KEYSTORE_PATH), keystorePasswordArray);
+
+        // Create the SSL context
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance(KeyManagerFactory.getDefaultAlgorithm());
+        kmf.init(keystore, keystorePasswordArray);
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(keystore);
+        SSLContext sslContext = SSLContext.getInstance("TLS");
+        sslContext.init(kmf.getKeyManagers(), tmf.getTrustManagers(), null);
+
+        HttpsServer server = HttpsServer.create(new InetSocketAddress(PORT), 0);
+        server.setHttpsConfigurator(new HttpsConfigurator(sslContext));
+        server.createContext("/", new ProxyHandler());
+        server.setExecutor(null);
+        server.start();
+        logger.info("Proxy server started on port 8000");
+    }
+
+    static class ProxyHandler implements HttpHandler {
+        @Override
+        public void handle(HttpExchange exchange) throws IOException {
+            String requestURL = exchange.getRequestURI().toString().substring(1);
+            logger.info("Received a new request: " + requestURL);
+
+            URL url;
+            try {
+                url = new URI(requestURL).toURL();
+            } catch (URISyntaxException e) {
+                throw new RuntimeException(e);
+            }
+            HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+            connection.setRequestMethod(exchange.getRequestMethod());
+
+            // Copy request headers from the client to the server
+            for (String header : exchange.getRequestHeaders().keySet()) {
+                connection.setRequestProperty(header, exchange.getRequestHeaders().getFirst(header));
+            }
+
+            connection.setDoInput(true);
+            connection.setDoOutput(true);
+
+            // Read the server response
+            int responseCode = connection.getResponseCode();
+            InputStream inputStream = connection.getInputStream();
+
+            // Copy response headers from the server to the client
+            for (String header : connection.getHeaderFields().keySet()) {
+                if (header != null) {
+                    exchange.getResponseHeaders().put(header, connection.getHeaderFields().get(header));
+                }
+            }
+
+            exchange.sendResponseHeaders(responseCode, connection.getContentLengthLong());
+            OutputStream outputStream = exchange.getResponseBody();
+
+            // Copy response body from the server to the client
+            byte[] buffer = new byte[4096];
+            int bytesRead;
+            while ((bytesRead = inputStream.read(buffer)) != -1) {
+                outputStream.write(buffer, 0, bytesRead);
+            }
+
+            outputStream.close();
+            inputStream.close();
+            connection.disconnect();
+            logger.info("Request handled successfully");
+        }
+    }
 }
