@@ -1,10 +1,7 @@
 package me.gravolan.proxy;
 
 import com.sun.net.httpserver.*;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.FileInputStream;
+import java.io.*;
 import java.net.*;
 import java.security.cert.CertificateException;
 import java.util.logging.*;
@@ -13,6 +10,7 @@ import java.security.*;
 
 public class Proxy {
     private static final Logger logger = Logger.getLogger(Proxy.class.getName());
+    private static final LimitedCache<String, byte[]> cache = new LimitedCache<>((int) Runtime.getRuntime().freeMemory());
     private static final int PORT = 8000;
     private static final String KEYSTORE_PATH = "src/me/gravolan/proxy/keystore.jks";
     private static final String KEYSTORE_PASSWORD = "pwnword";
@@ -50,6 +48,18 @@ public class Proxy {
             String requestURL = exchange.getRequestURI().toString().substring(1);
             logger.info("Received a new request: " + requestURL);
 
+            // Check if the requested URL is in the cache
+            byte[] cachedResponse = cache.get(requestURL);
+            if (cachedResponse != null) {
+                // Serve the response from the cache
+                System.out.println("Serving response from cache");
+                exchange.sendResponseHeaders(200, cachedResponse.length);
+                OutputStream outputStream = exchange.getResponseBody();
+                outputStream.write(cachedResponse);
+                outputStream.close();
+                return;
+            }
+
             URL url;
             try {
                 url = new URI(requestURL).toURL();
@@ -64,33 +74,45 @@ public class Proxy {
                 connection.setRequestProperty(header, exchange.getRequestHeaders().getFirst(header));
             }
 
-            connection.setDoInput(true);
-            connection.setDoOutput(true);
+            try (AutoCloseable ignored = connection::disconnect) { // Wrap the connection in a try-with-resources block (Java 7+)
+                connection.setDoInput(true);
+                connection.setDoOutput(true);
 
-            // Read the server response
-            int responseCode = connection.getResponseCode();
-            InputStream inputStream = connection.getInputStream();
+                // Read the server response
+                int responseCode = connection.getResponseCode();
+                InputStream inputStream = connection.getInputStream();
+                ByteArrayOutputStream responseBytes = new ByteArrayOutputStream();
 
-            // Copy response headers from the server to the client
-            for (String header : connection.getHeaderFields().keySet()) {
-                if (header != null) {
-                    exchange.getResponseHeaders().put(header, connection.getHeaderFields().get(header));
+                // Copy response headers from the server to the client
+                for (String header : connection.getHeaderFields().keySet()) {
+                    if (header != null) {
+                        exchange.getResponseHeaders().put(header, connection.getHeaderFields().get(header));
+                    }
                 }
+
+                exchange.sendResponseHeaders(responseCode, connection.getContentLengthLong());
+                OutputStream outputStream = exchange.getResponseBody();
+
+                // Copy response body from the server to the client
+                byte[] buffer = new byte[4096];
+                int bytesRead;
+                while ((bytesRead = inputStream.read(buffer)) != -1) {
+                    exchange.getResponseBody().write(buffer, 0, bytesRead);
+                }
+                logger.info("Copied response body from server to client");
+
+                if (responseCode == 200) {
+                    byte[] responseByteArray = responseBytes.toByteArray();
+                    cache.put(requestURL, responseByteArray);
+                }
+
+                outputStream.close();
+                inputStream.close();
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            } finally {
+                connection.disconnect();
             }
-
-            exchange.sendResponseHeaders(responseCode, connection.getContentLengthLong());
-            OutputStream outputStream = exchange.getResponseBody();
-
-            // Copy response body from the server to the client
-            byte[] buffer = new byte[4096];
-            int bytesRead;
-            while ((bytesRead = inputStream.read(buffer)) != -1) {
-                outputStream.write(buffer, 0, bytesRead);
-            }
-
-            outputStream.close();
-            inputStream.close();
-            connection.disconnect();
             logger.info("Request handled successfully");
         }
     }

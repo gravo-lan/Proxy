@@ -4,8 +4,9 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5d38f4a1-d86a-4710-86a2-2edf6f4a9dcb" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/src/me/gravolan/proxy/keystore.jks" afterDir="false" />
+    <list default="true" id="5d38f4a1-d86a-4710-86a2-2edf6f4a9dcb" name="Changes" comment="Basic Framework">
+      <change afterPath="$PROJECT_DIR$/src/me/gravolan/proxy/LimitedCache.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/me/gravolan/proxy/Proxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/me/gravolan/proxy/Proxy.java" afterDir="false" />
     </list>
@@ -23,6 +24,9 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
   </component>
   <component name="ProjectColorInfo"><![CDATA[{
   "associatedIndex": 7
@@ -63,8 +67,17 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1711504066908</updated>
-      <workItem from="1711504068098" duration="4223000" />
+      <workItem from="1711504068098" duration="14423000" />
     </task>
+    <task id="LOCAL-00001" summary="Basic Framework">
+      <option name="closed" value="true" />
+      <created>1711510737523</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1711510737523</updated>
+    </task>
+    <option name="localTasksCounter" value="2" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -72,5 +85,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
+    <MESSAGE value="Basic Framework" />
+    <option name="LAST_COMMIT_MESSAGE" value="Basic Framework" />
   </component>
 </project>
