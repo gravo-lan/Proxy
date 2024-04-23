@@ -73,22 +73,46 @@ public class Proxy {
             for (String header : exchange.getRequestHeaders().keySet()) {
                 connection.setRequestProperty(header, exchange.getRequestHeaders().getFirst(header));
             }
+            logger.info("Copied request headers from client to server");
 
             try (AutoCloseable ignored = connection::disconnect) { // Wrap the connection in a try-with-resources block (Java 7+)
                 connection.setDoInput(true);
                 connection.setDoOutput(true);
+                logger.info("Enabled connection input and output");
 
                 // Read the server response
                 int responseCode = connection.getResponseCode();
+                logger.info("Received server response code: " + responseCode);
+                if(responseCode>=400) {
+                    StringBuilder htmlBuilder = new StringBuilder();
+                    htmlBuilder.append("<html>")
+                            .append("<body>")
+                            .append("<p>")
+                            .append("Error: ")
+                            .append(responseCode)
+                            .append("</p>")
+                            .append("</body>")
+                            .append("</html>");
+                    exchange.sendResponseHeaders(200, htmlBuilder.length());
+                    OutputStream outputStream = exchange.getResponseBody();
+                    outputStream.write(htmlBuilder.toString().getBytes());
+                    outputStream.flush();
+                    outputStream.close();
+                    return;
+                }
                 InputStream inputStream = connection.getInputStream();
                 ByteArrayOutputStream responseBytes = new ByteArrayOutputStream();
+                logger.info("Read server response");
 
                 // Copy response headers from the server to the client
+                logger.info("Headers to copy: " + connection.getHeaderFields().keySet().size());
                 for (String header : connection.getHeaderFields().keySet()) {
                     if (header != null) {
                         exchange.getResponseHeaders().put(header, connection.getHeaderFields().get(header));
                     }
+                    else logger.info("Header is null");
                 }
+                logger.info("Copied response headers from server to client");
 
                 exchange.sendResponseHeaders(responseCode, connection.getContentLengthLong());
                 OutputStream outputStream = exchange.getResponseBody();
@@ -96,6 +120,7 @@ public class Proxy {
                 // Copy response body from the server to the client
                 byte[] buffer = new byte[4096];
                 int bytesRead;
+                logger.info("Buffer created");
                 while ((bytesRead = inputStream.read(buffer)) != -1) {
                     exchange.getResponseBody().write(buffer, 0, bytesRead);
                 }
