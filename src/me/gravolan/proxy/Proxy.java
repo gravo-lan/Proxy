@@ -11,11 +11,21 @@ import java.security.*;
 public class Proxy {
     private static final Logger logger = Logger.getLogger(Proxy.class.getName());
     private static final LimitedCache<String, byte[]> cache = new LimitedCache<>((int) Runtime.getRuntime().freeMemory());
-    private static final int PORT = 8000;
+    private static int PORT = 8000;
     private static final String KEYSTORE_PATH = "src/me/gravolan/proxy/keystore.jks";
     private static final String KEYSTORE_PASSWORD = "pwnword";
 
     public static void main(String[] args) throws IOException, KeyStoreException, CertificateException, NoSuchAlgorithmException, UnrecoverableKeyException, KeyManagementException {
+        if (args.length>2) throw new IllegalArgumentException();
+        else if (args.length==1) {
+            try {
+                PORT = Integer.parseInt(args[0]);
+            }
+            catch (Exception e) {
+                throw new IllegalArgumentException();
+            }
+        }
+
         logger.setLevel(Level.INFO);
         ConsoleHandler consoleHandler = new ConsoleHandler();
         consoleHandler.setLevel(Level.ALL);

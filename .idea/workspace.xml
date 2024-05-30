@@ -4,16 +4,13 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="5d38f4a1-d86a-4710-86a2-2edf6f4a9dcb" name="Changes" comment="Completed Cache">
+    <list default="true" id="5d38f4a1-d86a-4710-86a2-2edf6f4a9dcb" name="Changes" comment="Updated Error Code Handling">
       <change afterPath="$PROJECT_DIR$/lib/commons-pool2-2.11.1.jar" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/lib/gson-2.8.9.jar" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/lib/jedis-4.2.3.jar" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/lib/json-20211205.jar" afterDir="false" />
       <change afterPath="$PROJECT_DIR$/lib/slf4j-api-1.7.32.jar" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/me/gravolan/proxy/HTTPServerProxy.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/src/me/gravolan/proxy/TestProxyServer.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Proxy.iml" beforeDir="false" afterPath="$PROJECT_DIR$/Proxy.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/me/gravolan/proxy/Proxy.java" beforeDir="false" afterPath="$PROJECT_DIR$/src/me/gravolan/proxy/Proxy.java" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -61,7 +58,7 @@
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Libraries",
+    "project.structure.last.edited": "Artifacts",
     "project.structure.proportion": "0.0",
     "project.structure.side.proportion": "0.2",
     "vue.rearranger.settings.migration": "true"
@@ -82,6 +79,13 @@
       <updated>1711504066908</updated>
       <workItem from="1711504068098" duration="14423000" />
       <workItem from="1713498755963" duration="8684000" />
+      <workItem from="1713849659971" duration="684000" />
+      <workItem from="1714004211593" duration="3095000" />
+      <workItem from="1714705687599" duration="624000" />
+      <workItem from="1716184472114" duration="601000" />
+      <workItem from="1716336284087" duration="627000" />
+      <workItem from="1716778962774" duration="1268000" />
+      <workItem from="1717060767823" duration="466000" />
     </task>
     <task id="LOCAL-00001" summary="Basic Framework">
       <option name="closed" value="true" />
@@ -99,7 +103,15 @@
       <option name="project" value="LOCAL" />
       <updated>1713498925052</updated>
     </task>
-    <option name="localTasksCounter" value="3" />
+    <task id="LOCAL-00003" summary="Updated Error Code Handling">
+      <option name="closed" value="true" />
+      <created>1713849743423</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1713849743423</updated>
+    </task>
+    <option name="localTasksCounter" value="4" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -109,6 +121,7 @@
     <option name="ADD_EXTERNAL_FILES_SILENTLY" value="true" />
     <MESSAGE value="Basic Framework" />
     <MESSAGE value="Completed Cache" />
-    <option name="LAST_COMMIT_MESSAGE" value="Completed Cache" />
+    <MESSAGE value="Updated Error Code Handling" />
+    <option name="LAST_COMMIT_MESSAGE" value="Updated Error Code Handling" />
   </component>
 </project>
